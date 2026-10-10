@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Autobus Complete · Join a game</title>
+<link rel="stylesheet" href="style.css">
+<style>
+  .join { display:inline-block; margin:1rem 0; padding:.9rem 1.6rem; border-radius:999px;
+          background:#F2A900; color:#1F2430; font-weight:800; font-size:1.15rem; text-decoration:none; }
+  .code { font-size:2rem; font-weight:900; letter-spacing:.3rem; }
+</style>
+</head>
+<body>
+<main>
+<h1>🚌 Autobus Complete</h1>
+<p class="lead">You've been invited to a game!</p>
+<p>Room <span class="code" id="code">·····</span></p>
+<p><a class="join" id="open" href="#">Open in Autobus Complete</a></p>
+<p id="help">Nothing happened? Make sure the Autobus Complete app is installed (ask the person who
+sent you this link), then tap the button again. You can also open the app, tap
+<em>Multiplayer → Join room</em> and type the room code.</p>
+<p><a href="index.html">Support</a> · <a href="privacy.html">Privacy Policy</a></p>
+</main>
+<script>
+// Hands the room code and invite key to the app. Nothing is sent anywhere else: this page has
+// no analytics and makes no requests.
+(function () {
+  var q = new URLSearchParams(location.search);
+  var code = (q.get('code') || '').toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 8);
+  var key = (q.get('k') || '').replace(/[^\w-]/g, '').slice(0, 64);
+  var open = document.getElementById('open');
+  if (!code || !key) {
+    document.querySelector('.lead').textContent = 'This invite link is incomplete.';
+    open.style.display = 'none';
+    return;
+  }
+  document.getElementById('code').textContent = code;
+  var params = 'code=' + code + '&k=' + encodeURIComponent(key);
+  var app = 'autobus://join?' + params;
+  var android = /Android/i.test(navigator.userAgent);
+  // Android Chrome: an intent link opens the app, or stays here if it isn't installed.
+  open.href = android
+    ? 'intent://join?' + params + '#Intent;scheme=autobus;package=com.autobuscomplete.app;S.browser_fallback_url=' +
+      encodeURIComponent(location.href.split('#')[0] + '#noapp') + ';end'
+    : app;
+  if (location.hash !== '#noapp') {
+    setTimeout(function () { location.href = open.href; }, 300);
+  }
+})();
+</script>
+</body>
+</html>
